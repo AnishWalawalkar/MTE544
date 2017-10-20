@@ -70,23 +70,5 @@ plot(x(1, :), x(2, :));
 
 %% drive in spiral
 
-rot = eye(3);
-x_prev = [0; 0; 0];
-x = [];
-u = [1; 0; 2]
-
-for i = 1:150
-    dist = randn(3,1) .* e;
-    x(:, i) = x_prev + rot*B*u*dt;
-    rot = [cos(x(3, i)) -sin(x(3, i)) 0;
-        sin(x(3, i)) cos(x(3, i)) 0;
-        0 0 1];
-    u(3) = 1/((i*dt)^2+0.5)
-    x_prev = x(: , i);
-    
-end
-
-figure;
-plot(x(1, :), x(2, :));
 
 
