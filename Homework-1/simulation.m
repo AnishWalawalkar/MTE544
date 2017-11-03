@@ -24,18 +24,20 @@ cov_meas = [0.5 0   0;
             0   0.5 0;
             0   0   10*pi/180].^2; % verify variance / std
 
+cov_meas_corr = [0.01 0    0;
+                 0    0.01 0;
+                 0    0    10*pi/180].^2;
 
 
 
-
-%% drive with wheel speeds
+%% Drive with wheel speeds
 w1 = -1.5;
 w2 = 2.0;
 w3 = 1.0;
 u = [w1; w2; w3];
 u = repmat(u, 1, T/dt);
 
-[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, T);
+[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
 
 figure(1);
 plot(x_true(1, :), x_true(2, :));
@@ -43,7 +45,7 @@ plot(x_true(1, :), x_true(2, :));
 hold on
 scatter(y(1, :), y(2, :), '.');
 plot(x_est(1, :), x_est(2, :), '-.');
-for i = 1:5:150
+for i = 1:1:150
     error_ellipse(x_cov(1:2, 1:2, i), x_est(1:2, i), 'style', 'm');
 end
 legend('True State', 'GPS Measurements', 'Estimated State', 'Error Ellipses');
@@ -51,6 +53,25 @@ camroll(90)
 xlabel('North [m]')
 ylabel('West [m]')
 title('EKF Implementation for Three Omni-Wheeled Robot')
+
+
+%% Drive with wheel speeds Multirate
+[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas_corr, T);
+
+figure(2);
+plot(x_true(1, :), x_true(2, :));
+
+hold on
+scatter(y(1, :), y(2, :), '.');
+plot(x_est(1, :), x_est(2, :), '-.');
+for i = 1:1:150
+    error_ellipse(x_cov(1:2, 1:2, i), x_est(1:2, i), 'style', 'm');
+end
+legend('True State', 'GPS Measurements', 'Estimated State', 'Error Ellipses');
+camroll(90)
+xlabel('North [m]')
+ylabel('West [m]')
+title('Multi-Rate EKF Implementation for Three Omni-Wheeled Robot')
 
 %% drive in cirle
 
@@ -61,9 +82,9 @@ for i = 1:T/dt
     u(:, i) = B\[v*cos(i*dt); v*sin(i*dt); 0];
 end
 
-[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, T);
+[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
 
-figure(2);
+figure(3);
 plot(x_true(1, :), x_true(2, :));
 
 %% drive in straight line
@@ -74,9 +95,9 @@ theta = pi/4;
 u = B\[v*cos(theta); v*sin(theta); 0];
 u = repmat(u, 1, T/dt);
 
-[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, T);
+[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
 
-figure(3);
+figure(4);
 plot(x_true(1, :), x_true(2, :));
 
 
@@ -86,9 +107,9 @@ for i = 1:T/dt
     u(:, i) = B\[cos(i*dt) - i*dt*sin(i*dt); sin(i*dt)+i*dt*cos(i*dt); 0];
 end
 
-[x_true, y, x_est, x_cov] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, T);
+[x_true, y, x_est, x_cov] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
 
-figure(4);
+figure(5);
 plot(x_true(1, :), x_true(2, :));
 
 

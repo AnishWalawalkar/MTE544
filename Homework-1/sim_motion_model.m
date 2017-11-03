@@ -1,4 +1,4 @@
-function [ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, T, dt)
+function [ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas_corr, T)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -10,15 +10,10 @@ function [ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist,
     decl = [0; 0; -9.7*pi/180];
 
     R = cov_dist;
-    Q = cov_meas;
     mu_p = x_prev;
     x_est = x_prev;
-    cov_p = 3.*eye(3);
-    x_cov = 3.*eye(3);
-    
-    cov_meas_corr = [0.01 0 0;
-                           0    0.01 0;
-                           0    0    10*pi/180].^2;
+    cov_p = 0.5.*eye(3);
+    x_cov = 0.5.*eye(3);
     
     [REx, Rex] = eig(cov_dist);
     [REy, Rey] = eig(cov_meas);
@@ -31,10 +26,10 @@ function [ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist,
         x_true(:, i) = A*x_prev + rot*B*u(:, i) + Ex;
         rot = [cos(x_true(3, i)) -sin(x_true(3, i)) 0;
                sin(x_true(3, i)) cos(x_true(3, i))  0;
-               0            0             1];
+               0            0    1];
         % Generate GPS and MAG measurements
         
-        if (mod(T, 10) == 0)
+        if (mod(i, 10) == 0)
             Ey = REycorr*sqrt(Reycorr)*randn(3,1);
         else
             Ey = REy*sqrt(Rey)*randn(3,1);
@@ -48,7 +43,7 @@ function [ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist,
         cov_p(:, :, i) = A*x_cov(:, :, i-1) + R;
         
         % EKF Measurement Update
-        if (mod(T, 10) == 0)
+        if (mod(i, 10) == 0)
             Q = cov_meas_corr;
         else
             Q = cov_meas;
