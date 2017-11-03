@@ -43,7 +43,7 @@ plot(x_true(1, :), x_true(2, :));
 hold on
 scatter(y(1, :), y(2, :), '.');
 plot(x_est(1, :), x_est(2, :), '-.');
-for i = 2:10:150
+for i = 1:5:150
     error_ellipse(x_cov(1:2, 1:2, i), x_est(1:2, i), 'style', 'm');
 end
 legend('True State', 'GPS Measurements', 'Estimated State', 'Error Ellipses');
