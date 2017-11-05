@@ -131,7 +131,7 @@ v = 1;
 
 
 for i = 1:T/dt
-    u(:, i) = B\[v*cos(i*dt); v*sin(i*dt); 0];
+    u(:, i) = (B/dt)\[v*cos(i*dt); v*sin(i*dt); 0];
 end
 
 [ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
