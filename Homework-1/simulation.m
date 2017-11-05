@@ -19,10 +19,10 @@ D = zeros(3);
 B_inv = inv(B);
 cov_dist = [0.01 0    0;
             0    0.01 0;
-            0    0    0.1].^2; % verify variance / std
+            0    0    0.1*pi/180].^2;
 cov_meas = [0.5 0   0;
             0   0.5 0;
-            0   0   10*pi/180].^2; % verify variance / std
+            0   0   10*pi/180].^2;
 
 cov_meas_corr = [0.01 0    0;
                  0    0.01 0;
@@ -30,7 +30,7 @@ cov_meas_corr = [0.01 0    0;
 
 
 
-%% Drive with wheel speeds
+%% Drive with wheel speeds EKF
 w1 = -1.5;
 w2 = 2.0;
 w3 = 1.0;
@@ -80,7 +80,7 @@ legend('True State', 'Estimated State')
 ylabel('Yaw [rad]')
 xlabel('Time [s]')
 title('EKF Estimation vs True State in Yaw')
-%% Drive with wheel speeds Multirate
+%% Drive with wheel speeds Multirate EKF
 [ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas_corr, T);
 
 figure(2);
@@ -125,49 +125,160 @@ ylabel('Yaw [rad]')
 xlabel('Time [s]')
 title('EKF Estimation vs True State in Yaw')
 
-%% drive in cirle
 
-v = 1;
+%% Drive with wheel speeds simulation
+w1 = -1.5;
+w2 = 2.0;
+w3 = 1.0;
+u = [w1; w2; w3];
+u = repmat(u, 1, T/dt);
 
-
-for i = 1:T/dt
-    u(:, i) = B\[v*cos(i*dt); v*sin(i*dt); 0];
-end
+cov_dist = zeros(3,3);
+cov_meas = zeros(3, 3);
 
 [ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
 
 figure(3);
-plot(x_true(1, :), x_true(2, :));
+subplot(1,2,1);
+plot(x_true(1,:), x_true(2, :));
+camroll(90);
+xlabel('North [m]');
+ylabel('West [m]');
+title('True robot state simulation: given inputs without noise')
 
+cov_dist = [0.01 0    0;
+            0    0.01 0;
+            0    0    0.1].^2;
+cov_meas = [0.5 0   0;
+            0   0.5 0;
+            0   0   10*pi/180].^2;
+
+[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
+
+subplot(1,2,2);
+plot(x_true(1,:), x_true(2, :));
+camroll(90);
+xlabel('North [m]');
+ylabel('West [m]');
+title('True robot state simulation: given inputs with noise')
+
+
+
+%% drive in 2m cirle
+
+v = 1*dt;
+
+cov_dist = zeros(3,3);
+cov_meas = zeros(3, 3);
+
+for i = 1:T
+    u(:, i) = B\[v*cos(i*dt); v*sin(i*dt); 0];
+end
+
+
+cov_dist = zeros(3,3);
+cov_meas = zeros(3, 3);
+
+[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
+
+
+figure(4);
+subplot(1,2,1);
+plot(x_true(1,:), x_true(2, :));
+camroll(90);
+xlabel('North [m]')
+ylabel('West [m]')
+title('True robot state simulation: driving in 2m circle without noise')
+
+cov_dist = [0.01 0    0;
+            0    0.01 0;
+            0    0    0.1].^2;
+cov_meas = [0.5 0   0;
+            0   0.5 0;
+            0   0   10*pi/180].^2;
+
+[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
+
+subplot(1,2,2);
+plot(x_true(1,:), x_true(2, :));
+camroll(90);
+xlabel('North [m]')
+ylabel('West [m]')
+title('True robot state simulation: driving in 2m circle with noise')
 %% drive in straight line
 
-v = 1;
+v = 1*dt;
 theta = pi/4;
 
 u = B\[v*cos(theta); v*sin(theta); 0];
 u = repmat(u, 1, T/dt);
 
+
+cov_dist = zeros(3,3);
+cov_meas = zeros(3, 3);
+
 [ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
 
-figure(4);
-plot(x_true(1, :), x_true(2, :));
 
+figure(5);
+subplot(1,2,1);
+plot(x_true(1,:), x_true(2, :));
+camroll(90)
+xlabel('North [m]')
+ylabel('West [m]')
+title('True robot state simulation: driving in straight line without noise')
+
+cov_dist = [0.01 0    0;
+            0    0.01 0;
+            0    0    0.1].^2;
+cov_meas = [0.5 0   0;
+            0   0.5 0;
+            0   0   10*pi/180].^2;
+
+[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
+
+subplot(1,2,2);
+plot(x_true(1,:), x_true(2, :));
+camroll(90);
+xlabel('North [m]')
+ylabel('West [m]')
+title('True robot state simulation: driving in straight line with noise')
 
 %% drive in spiral
 
-for i = 1:T/dt
-    u(:, i) = B\[cos(i*dt) - i*dt*sin(i*dt); sin(i*dt)+i*dt*cos(i*dt); 0];
+v = 1*dt;
+
+for i = 1:T
+    u(:, i) = B\[v*(cos(i*dt) - i*dt*sin(i*dt)); v*(sin(i*dt)+i*dt*cos(i*dt)); 0];
 end
+
+
+cov_dist = zeros(3,3);
+cov_meas = zeros(3, 3);
 
 [x_true, y, x_est, x_cov] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
 
-figure(5);
-plot(x_true(1, :), x_true(2, :));
 
+figure(6);
+subplot(1,2,1);
+plot(x_true(1,:), x_true(2, :));
+camroll(90)
+xlabel('North [m]')
+ylabel('West [m]')
+title('True robot state simulation: driving in a spiral without noise')
 
+cov_dist = [0.01 0    0;
+            0    0.01 0;
+            0    0    0.1].^2;
+cov_meas = [0.5 0   0;
+            0   0.5 0;
+            0   0   10*pi/180].^2;
 
+[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
 
-
-
-
-
+subplot(1,2,2);
+plot(x_true(1,:), x_true(2, :));
+camroll(90);
+xlabel('North [m]')
+ylabel('West [m]')
+title('True robot state simulation: driving in a spiral with noise')
