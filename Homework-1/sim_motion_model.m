@@ -40,7 +40,7 @@ function [ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist,
 
         % EKF Prediction Update
         mu_p(:, i) = A*x_est(:, i-1) + rot*B*u(:, i);
-        cov_p(:, :, i) = A*x_cov(:, :, i-1) + R;
+        cov_p(:, :, i) = A*x_cov(:, :, i-1)' + R;
         
         % EKF Measurement Update
         if (mod(i, 10) == 0)
