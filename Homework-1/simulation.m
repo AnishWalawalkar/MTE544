@@ -131,28 +131,30 @@ w1 = -1.5;
 w2 = 2.0;
 w3 = 1.0;
 u = [w1; w2; w3];
-u = repmat(u, 1, T/dt);
+u = repmat(u, 1, T);
 
 
-[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, zeros(3,3), cov_meas, cov_meas, T);
+[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
 
 figure(3);
 subplot(1,2,1);
 plot(x_true(1,:), x_true(2, :));
 camroll(90);
-xlabel('North [m]');
-ylabel('West [m]');
-title('True robot state simulation: given inputs without noise')
-
-[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
+xlabel('North [m]', 'FontSize', 16);
+ylabel('West [m]', 'FontSize', 16);
+title('True robot state simulation: given inputs', 'FontSize', 16)
 
 subplot(1,2,2);
-plot(x_true(1,:), x_true(2, :));
-camroll(90);
-xlabel('North [m]');
-ylabel('West [m]');
-title('True robot state simulation: given inputs with noise')
-
+time = dt:dt:15;
+plot(time, u(1,:));
+hold on;
+plot(time, u(2,:));
+plot(time, u(3,:));
+xlabel('Time [s]', 'FontSize', 16);
+ylabel('Input [rad/s]', 'FontSize', 16);
+legend('u_1', 'u_2', 'u_3');
+title('Inputs applied to the system', 'FontSize', 16);
+hold off;
 
 %% drive in 2m cirle
 
@@ -163,58 +165,59 @@ for i = 1:T
 end
 
 
-cov_dist = zeros(3,3);
-cov_meas = zeros(3, 3);
-
-[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, zeros(3,3), cov_meas, cov_meas, T);
-
+[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
 
 figure(4);
+
 subplot(1,2,1);
 plot(x_true(1,:), x_true(2, :));
 camroll(90);
-xlabel('North [m]')
-ylabel('West [m]')
-title('True robot state simulation: driving in 2m circle without noise')
-
-
-[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
+xlabel('North [m]', 'FontSize', 16)
+ylabel('West [m]', 'FontSize', 16)
+title('True robot state simulation: driving in 2m circle', 'FontSize', 16)
 
 subplot(1,2,2);
-plot(x_true(1,:), x_true(2, :));
-camroll(90);
-xlabel('North [m]')
-ylabel('West [m]')
-title('True robot state simulation: driving in 2m circle with noise')
+time = dt:dt:15;
+plot(time, u(1,:));
+hold on;
+plot(time, u(2,:));
+plot(time, u(3,:));
+xlabel('Time [s]', 'FontSize', 16);
+ylabel('Input [rad/s]', 'FontSize', 16);
+legend('u_1', 'u_2', 'u_3');
+title('Inputs applied to the system', 'FontSize', 16);
+hold off;
 %% drive in straight line
 
 v = 1*dt;
 theta = pi/4;
 
 u = B\[v*cos(theta); v*sin(theta); 0];
-u = repmat(u, 1, T/dt);
+u = repmat(u, 1, T);
 
 
-[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, zeros(3,3), cov_meas, cov_meas, T);
-
+[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
 
 figure(5);
 subplot(1,2,1);
 plot(x_true(1,:), x_true(2, :));
 camroll(90)
-xlabel('North [m]')
-ylabel('West [m]')
-title('True robot state simulation: driving in straight line without noise')
-
-
-[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
+xlabel('North [m]', 'FontSize', 16)
+ylabel('West [m]', 'FontSize', 16)
+title('True robot state simulation: driving in straight line', 'FontSize', 16)
 
 subplot(1,2,2);
-plot(x_true(1,:), x_true(2, :));
-camroll(90);
-xlabel('North [m]')
-ylabel('West [m]')
-title('True robot state simulation: driving in straight line with noise')
+time = dt:dt:15;
+plot(time, u(1,:));
+hold on;
+plot(time, u(2,:));
+plot(time, u(3,:));
+xlabel('Time [s]', 'FontSize', 16);
+ylabel('Input [rad/s]', 'FontSize', 16);
+legend('u_1', 'u_2', 'u_3');
+title('Inputs applied to the system', 'FontSize', 16);
+hold off;
+
 
 %% drive in spiral
 
@@ -224,24 +227,24 @@ for i = 1:T
     u(:, i) = B\[v*(cos(i*dt) - i*dt*sin(i*dt)); v*(sin(i*dt)+i*dt*cos(i*dt)); 0];
 end
 
-
-[x_true, y, x_est, x_cov] = sim_motion_model(A, B, C, D, u, zeros(3,3), cov_meas, cov_meas, T);
-
+[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
 
 figure(6);
 subplot(1,2,1);
 plot(x_true(1,:), x_true(2, :));
 camroll(90)
-xlabel('North [m]')
-ylabel('West [m]')
-title('True robot state simulation: driving in a spiral without noise')
-
-
-[ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
+xlabel('North [m]', 'FontSize', 16)
+ylabel('West [m]', 'FontSize', 16)
+title('True robot state simulation: driving in a spiral', 'FontSize', 16)
 
 subplot(1,2,2);
-plot(x_true(1,:), x_true(2, :));
-camroll(90);
-xlabel('North [m]')
-ylabel('West [m]')
-title('True robot state simulation: driving in a spiral with noise')
+time = dt:dt:15;
+plot(time, u(1,:));
+hold on;
+plot(time, u(2,:));
+plot(time, u(3,:));
+xlabel('Time [s]', 'FontSize', 16);
+ylabel('Input [rad/s]', 'FontSize', 16);
+legend('u_1', 'u_2', 'u_3');
+title('Inputs applied to the system', 'FontSize', 16);
+hold off;

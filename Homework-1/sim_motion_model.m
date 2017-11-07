@@ -53,6 +53,4 @@ function [ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist,
         x_est(:, i) = mu_p(:, i) + K*(y(:, i)-decl - C*mu_p(:, i));
         x_cov(:, :, i) = (eye(3) - K*C)*cov_p(:, :, i);
     end
-
 end
-
