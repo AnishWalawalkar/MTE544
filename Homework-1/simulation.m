@@ -39,6 +39,21 @@ u = repmat(u, 1, T/dt);
 
 [ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas, T);
 
+figure(8)
+hold on
+plot(x_true(1, :), x_true(2, :));
+scatter(y(1, :), y(2, :), '.');
+plot(x_est(1, :), x_est(2, :), 'g-.');
+for i = 1:3:150
+    error_ellipse(x_cov(1:2, 1:2, i), x_est(1:2, i), 'style', 'm');
+end
+legend('True State', 'GPS Measurements', 'Estimated State', 'Error Ellipses');
+camroll(90)
+xlabel('North [m]')
+ylabel('West [m]')
+title('EKF Implementation for Three Omni-Wheeled Robot')
+hold off
+
 figure(1);
 subplot(2, 2, 1)
 % X Y Plot of the True State, Measurements and Error
@@ -83,13 +98,12 @@ title('EKF Estimation vs True State in Yaw')
 %% Drive with wheel speeds Multirate EKF
 [ x_true, y, x_est, x_cov ] = sim_motion_model(A, B, C, D, u, cov_dist, cov_meas, cov_meas_corr, T);
 
-figure(2);
-subplot(2, 2, 1)
+figure(7)
 plot(x_true(1, :), x_true(2, :));
 
 hold on
 scatter(y(1, :), y(2, :), '.');
-plot(x_est(1, :), x_est(2, :), '-.');
+plot(x_est(1, :), x_est(2, :), 'g-.');
 for i = 1:1:150
     error_ellipse(x_cov(1:2, 1:2, i), x_est(1:2, i), 'style', 'm');
 end
@@ -99,7 +113,22 @@ xlabel('North [m]')
 ylabel('West [m]')
 title('Multi Rate EKF Implementation for Three Omni-Wheeled Robot')
 hold off
+figure(2);
+subplot(2, 2, 1)
+plot(x_true(1, :), x_true(2, :));
 
+hold on
+scatter(y(1, :), y(2, :), '.');
+plot(x_est(1, :), x_est(2, :), 'g-.');
+for i = 1:1:150
+    error_ellipse(x_cov(1:2, 1:2, i), x_est(1:2, i), 'style', 'm');
+end
+legend('True State', 'GPS Measurements', 'Estimated State', 'Error Ellipses');
+camroll(90)
+xlabel('North [m]')
+ylabel('West [m]')
+title('Multi Rate EKF Implementation for Three Omni-Wheeled Robot')
+hold off
 
 subplot(2, 2, 2)
 time = dt:dt:15;
