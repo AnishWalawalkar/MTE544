@@ -1,21 +1,20 @@
-function [ valid_path, path ] = find_shortest_path( waypoint1, waypoint2, milestones_x, milestones_y, adj_set )
+function [ valid_path, path ] = find_shortest_path( first, last, milestones_x, milestones_y, adj_set, map, resolution )
     valid_path = false;
     path = [];
     while ~valid_path
-        [found, path] = a_star(waypoint1, waypoint2, milestones_x, milestones_y, adj_set);
+        [found, path] = a_star(first, last, milestones_x, milestones_y, adj_set);
         if (~found); break; 
         else
             collision = false;
             for i=2:length(path)
-                prev_point = path(i-1, :);
-                curr = path(i, :);
-                collision = collision_detected(path(i-1, :), path(i, :));
+                prev_point = [milestones_x(path(i-1)), milestones_y(path(i-1))];
+                curr_point = [milestones_x(path(i)),   milestones_y(path(i))];
+                collision = collision_detected(prev_point, curr_point, map, resolution);
                 
                 if (collision)
-                    idx0 = find(prev_point(1));
-                    idx1 = find(curr(1));
-                    adj_set(idx0, idx1) = 0;
-                    adj_set(idx1, idx0) = 0;
+                    valid_path = false;
+                    adj_set(path(i-1), path(i))   = 0;
+                    adj_set(path(i),   path(i-1)) = 0;
                 end
             end
             
@@ -27,4 +26,3 @@ function [ valid_path, path ] = find_shortest_path( waypoint1, waypoint2, milest
         end
     end
 end
-

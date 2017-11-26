@@ -1,6 +1,6 @@
-function [ valid_path, path, milestones_x, milestones_y ] = prm( map, waypoint1, waypoint2 )
+function [ valid_path, path ] = prm( map, waypoint1, waypoint2 )
     % define constants
-    num_milestones = 100;
+    num_milestones = 300;
     map_resolution = 0.1;
     max_values = size(map) * map_resolution;
     min_values = [1 1];
@@ -19,20 +19,10 @@ function [ valid_path, path, milestones_x, milestones_y ] = prm( map, waypoint1,
             y2 = 10*randn + y1;
             xmid = (x1+x2)/2;
             ymid = (y1+y2)/2;
-            if (round(x2/map_resolution) > 0 &&...
-                round(y2/map_resolution) > 0 &&...
-                round(x2/map_resolution) < size(map, 1) &&...
-                round(y2/map_resolution) < size(map, 2) &&...
-                round(x1/map_resolution) > 0 &&...
-                round(y1/map_resolution) > 0 &&...
-                round(x1/map_resolution) < size(map, 1) &&...
-                round(y1/map_resolution) < size(map, 2))
-                if (map(round(x1/map_resolution), round(y1/map_resolution)) &&...
-                    map(round(x2/map_resolution), round(y2/map_resolution)) &&...
-                    ~map(round(xmid/map_resolution), round(ymid/map_resolution)))
-                   milestones(count, :) = [xmid ymid]; 
-                   count = count + 1;
-                end
+            
+            if ~map(ceil(x/map_resolution), ceil(y/map_resolution))
+               milestones(count, :) = [x y]; 
+               count = count + 1;
             end
         end
 
@@ -69,6 +59,15 @@ function [ valid_path, path, milestones_x, milestones_y ] = prm( map, waypoint1,
         if (valid_path); break; end;
     end
     
+    % Plotting
+    figure(1); clf; hold on;
+    colormap('gray');
+    imagesc(1-map');
+    plot(waypoint1(1)/map_resolution, waypoint1(2)/map_resolution, 'ro', 'MarkerSize',10, 'LineWidth', 3);
+    plot(waypoint2(1)/map_resolution, waypoint2(2)/map_resolution, 'gx', 'MarkerSize',10, 'LineWidth', 3 );
+    scatter(milestones_x/map_resolution, milestones_y/map_resolution, 'x');
+    plot(milestones_x(path)/map_resolution, milestones_y(path)/map_resolution, 'g');
+    axis equal
     
 end
 
