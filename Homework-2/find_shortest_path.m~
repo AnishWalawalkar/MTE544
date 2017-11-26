@@ -1,4 +1,4 @@
-function [ valid_path, path ] = find_shortest_path( first, last, milestones_x, milestones_y, adj_set, map, resolution )
+function [ valid_path, path ] = find_shortest_path( first, last, milestones_x, milestones_y, adj_set, map,  )
     valid_path = false;
     path = [];
     while ~valid_path
@@ -9,7 +9,7 @@ function [ valid_path, path ] = find_shortest_path( first, last, milestones_x, m
             for i=2:length(path)
                 prev_point = [milestones_x(path(i-1)), milestones_y(path(i-1))];
                 curr_point = [milestones_x(path(i)),   milestones_y(path(i))];
-                collision = collision_detected(prev_point, curr_point, map, resolution);
+                collision = collision_detected(prev_point, curr_point);
                 
                 if (collision)
                     adj_set(path(i-1), path(i))   = 0;
