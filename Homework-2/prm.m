@@ -49,7 +49,7 @@ function [ valid_path, path ] = prm( map, waypoint1, waypoint2 )
         % find shortest path and validate
 
         [valid_path, path] = find_shortest_path(waypoint1, waypoint2,...
-            milestones_x, milestones_y, adjacency_set);
+            milestones_x, milestones_y, adjacency_set, map, map_resolution);
         
         if (valid_path); break; end;
     end
