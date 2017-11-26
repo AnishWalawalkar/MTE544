@@ -72,4 +72,5 @@ for k = 1:length(T)
     x(:, k+1) = A*x(:, k) + Bu + Ex;
 end
 
+figure(1);
 plot(x(1,:), x(2,:))
