@@ -7,13 +7,15 @@ function [ valid_path, path ] = find_shortest_path( waypoint1, waypoint2, milest
         else
             collision = false;
             for i=2:length(path)
-                prev_point = [milestones_x(path(i-1)), milestones_y(path(i-1))];
-                curr_point = [milestones_x(path(i)),   milestones_y(path(i))];
-                collision = collision_detected(prev_point, curr_point);
+                prev_point = path(i-1, :);
+                curr = path(i, :);
+                collision = collision_detected(path(i-1, :), path(i, :));
                 
                 if (collision)
-                    adj_set(path(i-1), path(i))   = 0;
-                    adj_set(path(i),   path(i-1)) = 0;
+                    idx0 = find(prev_point(1));
+                    idx1 = find(curr(1));
+                    adj_set(idx0, idx1) = 0;
+                    adj_set(idx1, idx0) = 0;
                 end
             end
             

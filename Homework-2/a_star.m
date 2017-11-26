@@ -1,6 +1,7 @@
-function [ out_path ] = a_star( first, last, nodes_x, nodes_y, adj_mat )
+function [ path_found, out_path ] = a_star( first, last, nodes_x, nodes_y, adj_mat )
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
+    path_found = false;
     out_path = [];
     open_set = [0 first distance_nodes(first, last, nodes_x, nodes_y)];
     closed_set = [];
@@ -9,6 +10,11 @@ function [ out_path ] = a_star( first, last, nodes_x, nodes_y, adj_mat )
         % Current is lowest cost in open set
         [~, min_idx] = min(open_set(:, 3));
         current = open_set(min_idx, :);
+        
+        % Move from open set to closed set
+        open_set(min_idx, :) = [];
+        closed_set(end+1, :) = current;
+        
         if (current(2) == last)
             % Finished A* build path
             prev = last;
@@ -17,12 +23,9 @@ function [ out_path ] = a_star( first, last, nodes_x, nodes_y, adj_mat )
                 prev = closed_set(closed_set(:, 2) == prev, 1);
             end
             out_path = [first, out_path];
+            path_found = true;
             return;
         end
-        
-        % Move from open set to closed set
-        open_set(min_idx, :) = [];
-        closed_set(end+1, :) = current;
         
         adj_set = adj_mat(current(2), :);
         for neighbour = 1:length(adj_set)
@@ -30,7 +33,10 @@ function [ out_path ] = a_star( first, last, nodes_x, nodes_y, adj_mat )
                 ismember(neighbour, closed_set(:, 2)))
                 continue;
             end
-            newcost = current(3) + distance_nodes(current(2), neighbour, nodes_x, nodes_y);
+            newcost = current(3) ...
+                - distance_nodes(current(2), last,      nodes_x, nodes_y)...
+                + distance_nodes(current(2), neighbour, nodes_x, nodes_y)...
+                + distance_nodes(neighbour,  last,      nodes_x, nodes_y);
             % For each neighbour not in closed set
             [Lia, Locb] = ismember(neighbour, open_set(:, 2));
             if (Lia)
