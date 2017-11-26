@@ -1,0 +1,20 @@
+function [ valid_path, path ] = find_shortest_path( milestones_x, milestones_y, adj_set )
+    valid_path = false;
+    path = [];
+    while ~valid_path
+        [found, path] = a_star(milestones_x, milestones_y, adj_set);
+        if (~found); break; 
+        else
+            collision = false;
+            for i=2:length(path)
+                
+                collision = collision_detected(path(i-1, :), path(i, :));
+                if (collision)
+                    idx0 = find(
+                    idx1 = find(
+                end
+            end
+        end
+    end
+end
+
