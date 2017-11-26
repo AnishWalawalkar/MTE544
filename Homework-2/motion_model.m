@@ -61,7 +61,7 @@ for k = 1:length(T)
     carr_ang =  atan2(carrot_y - x(2,k),...
                       carrot_x - x(1,k));
     err_h = carr_ang - x(3,k);
-    u(2,k) = K_STEER * err_h;
+    u(2,k) = K_STEER * (err_h + err_d);
 
 	% Motion Model
     Ex = REx*sqrt(Rex)*randn(3,1);

@@ -1,0 +1,50 @@
+function [ out_path ] = a_star( first, last, nodes_x, nodes_y, adj_mat )
+%UNTITLED3 Summary of this function goes here
+%   Detailed explanation goes here
+    out_path = [];
+    open_set = [0 first distance_nodes(first, last, nodes_x, nodes_y)];
+    closed_set = [];
+    
+    while ~isempty(open_set)
+        % Current is lowest cost in open set
+        [~, min_idx] = min(open_set(:, 3));
+        current = open_set(min_idx, :);
+        if (current(2) == last)
+            % Finished A* build path
+            prev = last;
+            while prev ~= first
+                out_path = [prev, out_path];
+                prev = closed_set(closed_set(:, 2) == prev, 1);
+            end
+            out_path = [first, out_path];
+            return;
+        end
+        
+        % Move from open set to closed set
+        open_set(min_idx, :) = [];
+        closed_set(end+1, :) = current;
+        
+        adj_set = adj_mat(current(2), :);
+        for neighbour = 1:length(adj_set)
+            if (~adj_set(neighbour) ||...
+                ismember(neighbour, closed_set(:, 2)))
+                continue;
+            end
+            newcost = current(3) + distance_nodes(current(2), neighbour, nodes_x, nodes_y);
+            % For each neighbour not in closed set
+            [Lia, Locb] = ismember(neighbour, open_set(:, 2));
+            if (Lia)
+                % Update cost and prev if new cost is less
+                if (open_set(Locb, 3) > newcost)
+                    open_set(Locb, 3) = newcost;
+                    open_set(Locb, 1) = current(2);
+                end
+            else
+                % Add to Open Set
+                open_set(end+1, :) = [current(2), neighbour, newcost];
+            end
+        end
+    end
+    % A* failed to find path
+end
+
