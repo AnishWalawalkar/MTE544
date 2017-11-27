@@ -6,7 +6,8 @@
 % [ valid, path, milestones_x, milestones_y ] = prm(map, waypoint1, waypoint2);
 
 % Plotting
-figure(1); clf; hold on;
+fig = 1;
+figure(fig); clf; hold on;
 colormap('gray');
 imagesc(1-map');
 plot(waypoint1(1)/map_resolution, waypoint1(2)/map_resolution, 'ro', 'MarkerSize',10, 'LineWidth', 3);
@@ -90,9 +91,12 @@ for k = 1:length(T)
           tan(u(2,k))/L;]*u(1,k)*dt;
 
     x(:, k+1) = A*x(:, k) + Bu + Ex;
+    if ~mod(k, 10)
+        drawbox(x(1,k)/map_resolution, x(2,k)/map_resolution, x(3,k), 5, fig);
+    end
 end
 
-figure(1);
 plot(x(1,:)/map_resolution, x(2,:)/map_resolution)
+
 
 

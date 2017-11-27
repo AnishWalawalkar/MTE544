@@ -1,14 +1,13 @@
-map = read_map('IGVCmap.jpg');
-waypoint1 = [40 5];
-waypoint2 = [50 10];
-map_resolution = 0.1;
-
-[ valid, path, milestones_x, milestones_y ] = prm(map, waypoint1, waypoint2);
+% map = read_map('IGVCmap.jpg');
+% waypoint1 = [40 5];
+% waypoint2 = [50 10];
+% map_resolution = 0.1;
+% 
+% [ valid, path, milestones_x, milestones_y ] = prm(map, waypoint1, waypoint2);
 
 % Plotting
 figure(1); clf; hold on;
 colormap('gray');
-resized = imresize(map, 0
 imagesc(1-map');
 plot(waypoint1(1)/map_resolution, waypoint1(2)/map_resolution, 'ro', 'MarkerSize',10, 'LineWidth', 3);
 plot(waypoint2(1)/map_resolution, waypoint2(2)/map_resolution, 'gx', 'MarkerSize',10, 'LineWidth', 3 );
@@ -21,6 +20,7 @@ axis equal
 
 r = 1;
 K_STEER = 1;
+K_CT = 2;
 dt = 0.1;
 L = 0.3;
 A = eye(3);
@@ -28,7 +28,7 @@ cov_dist = [0.02 0 0;
             0 0.02 0;
             0 0 pi/180;].^2;
 u = [];
-T = 1:dt:20;
+T = 1:dt:2000;
 
 for k = 1:length(T)
    u(:,k) = [3;
@@ -36,7 +36,7 @@ for k = 1:length(T)
 end
 
 
-x = zeros(3,1);
+x = [40; 5; pi];
 
 [REx, Rex] = eig(cov_dist);
 
@@ -81,7 +81,7 @@ for k = 1:length(T)
     carr_ang =  atan2(carrot_y - x(2,k),...
                       carrot_x - x(1,k));
     err_h = carr_ang - x(3,k);
-    u(2,k) = K_STEER * (err_h + err_d);
+    u(2,k) = K_STEER * err_h + K_CT * err_d;
 
 	% Motion Model
     Ex = REx*sqrt(Rex)*randn(3,1);
@@ -92,7 +92,8 @@ for k = 1:length(T)
     x(:, k+1) = A*x(:, k) + Bu + Ex;
 end
 
-figure(1);
-plot(x(1,:), x(2,:))
+f = figure(1);
+plot(x(1,:)/map_resolution, x(2,:)/map_resolution)
+for 
 
 
