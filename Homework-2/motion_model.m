@@ -21,7 +21,7 @@ axis equal
 
 r = 1;
 K_STEER = 1;
-K_CT = 2;
+K_CT = 0;
 dt = 0.1;
 L = 0.3;
 A = eye(3);
@@ -29,7 +29,7 @@ cov_dist = [0.02 0 0;
             0 0.02 0;
             0 0 pi/180;].^2;
 u = [];
-T = 1:dt:2000;
+T = 1:dt:200;
 
 for k = 1:length(T)
    u(:,k) = [3;
@@ -82,7 +82,14 @@ for k = 1:length(T)
     carr_ang =  atan2(carrot_y - x(2,k),...
                       carrot_x - x(1,k));
     err_h = carr_ang - x(3,k);
+    if err_h > pi
+        err_h = err_h - 2*pi;
+    elseif err_h < -pi
+        err_h = err_h + 2*pi;
+    end
     u(2,k) = K_STEER * err_h + K_CT * err_d;
+    u(2,k) = max(u(2,k), -30*pi/180);
+    u(2,k) = min(u(2,k),  30*pi/180);
 
 	% Motion Model
     Ex = REx*sqrt(Rex)*randn(3,1);
@@ -91,9 +98,16 @@ for k = 1:length(T)
           tan(u(2,k))/L;]*u(1,k)*dt;
 
     x(:, k+1) = A*x(:, k) + Bu + Ex;
+    if (x(3, k+1) > pi)
+        x(3, k+1) = x(3, k+1) - 2*pi;
+    elseif (x(3, k+1) < -pi)
+        x(3, k+1) = x(3, k+1) + 2*pi;
+    end
     if ~mod(k, 10)
         drawbox(x(1,k)/map_resolution, x(2,k)/map_resolution, x(3,k), 5, fig);
     end
+%     drawbox(carrot_x/map_resolution, carrot_y/map_resolution, 0, 1, fig);
+
 end
 
 plot(x(1,:)/map_resolution, x(2,:)/map_resolution)
